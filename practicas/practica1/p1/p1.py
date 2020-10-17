@@ -6,14 +6,9 @@
 import sys
 import numpy as np
 import networkx as nx
-from itertools import tee
 import matplotlib.pyplot as plt
+import random
 from Graph import Graph
-
-def pairwise(iterable):
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
 
 if __name__ == '__main__':
     # Reading args
@@ -24,37 +19,49 @@ if __name__ == '__main__':
     graph = Graph(nx.Graph())
     graph.read_file(file)
 
-    # Creating random tree
-    num_nodes = graph.num_nodes
-    nodes = list(np.random.choice(num_nodes, size=num_nodes, replace=False))
+    stack = [np.random.choice(graph.nodes)]
     tree = []
-    for v, w in pairwise(nodes):
-        tree.append((v, w))
+    while stack:
+        v = stack.pop()
+        if not v.visited:
+            v.visited = True
+            tree.append(v)
+            random.shuffle(v.neighbours)
+            for w in v.neighbours:
+                stack.append(w)
 
     labels = {}
-    for i in range(num_nodes):
-        for j in range(i + 1, num_nodes):
+    for i in range(graph.num_nodes):
+        for j in range(i + 1, graph.num_nodes):
             dist = graph.weights[i][j]
-            if dist != 0 and not ((w, v) in labels):
+            if dist != 0 and not ((j, i) in labels):
                 labels[(i, j)] = dist
+
 
     # Checking if the tree weighs less than b
     tree_weight = graph.calc_tree_weight(tree)
-    print(tree_weight < b)
-
-    options = {
-        'node_color': 'pink',
-        'node_size': 500,
-        'width': 3,
-    }
+    tree_edges = graph.get_tree_edges(tree)
+    tree_labels = {}
+    for (u, v) in tree_edges:
+        tree_labels[(u, v)] = graph.weights[u][v]
+    print(tree_weight)
 
     positions = nx.shell_layout(graph.nx_graph)
 
+    plt.tight_layout()
+    mng = plt.get_current_fig_manager()
+    mng.full_screen_toggle()
+
+    plt.subplot(1, 2, 1)
     nx.draw_networkx(graph.nx_graph, positions, edge_color='black',width=1,linewidths=1, node_size=1000,node_color='pink',alpha=0.9)
     nx.draw_networkx_edge_labels(graph.nx_graph,positions, edge_labels=labels, font_color='red', alpha=0.7)
 
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
+    plt.subplot(1, 2, 2)
+    nx.draw_networkx_nodes(graph.nx_graph, positions, node_size=1000,node_color='pink',alpha=0.4)
+    nx.draw_networkx_labels(graph.nx_graph, positions)
+    nx.draw_networkx_edges(graph.nx_graph, positions, tree_edges, arrows=True)
+    nx.draw_networkx_edge_labels(graph.nx_graph,positions, edge_labels=tree_labels, font_color='red', alpha=0.7)
+    # nx.draw_networkx_edge_labels(graph.nx_graph,positions, edge_labels=labels, font_color='red', alpha=0.7)
 
     plt.axis("off")
     plt.show()

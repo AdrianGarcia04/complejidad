@@ -10,6 +10,6 @@ if __name__ == '__main__':
         for j in range(i + 1, num_nodes):
             coin = int(np.random.rand() * 1000 % 100)
             if edge_prob >= coin:
-                print(i, j, np.random.randint(100))
+                print(i, j, np.random.randint(100) + 1)
             else:
                 pass
