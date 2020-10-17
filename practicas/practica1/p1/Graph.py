@@ -6,6 +6,11 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+def get_node(nodes, id):
+    for node in nodes:
+        if node.id == id:
+            return node
+
 class Node:
 
     def __init__(self, id):
@@ -45,14 +50,9 @@ class Graph:
             self.nx_graph.add_edge(i1, i2, weight=w)
             for node in self.nodes:
                 if node.id == i1:
-                    node.add_neighbour(self.get_node(i2))
+                    node.add_neighbour(get_node(self.nodes, i2))
                 if node.id == i2:
-                    node.add_neighbour(self.get_node(i1))
-
-    def get_node(self, id):
-        for node in self.nodes:
-            if node.id == id:
-                return node
+                    node.add_neighbour(get_node(self.nodes, i1))
 
     def calc_tree_weight(self, tree):
         sum = 0

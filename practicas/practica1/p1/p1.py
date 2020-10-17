@@ -61,7 +61,6 @@ if __name__ == '__main__':
     nx.draw_networkx_labels(graph.nx_graph, positions)
     nx.draw_networkx_edges(graph.nx_graph, positions, tree_edges, arrows=True)
     nx.draw_networkx_edge_labels(graph.nx_graph,positions, edge_labels=tree_labels, font_color='red', alpha=0.7)
-    # nx.draw_networkx_edge_labels(graph.nx_graph,positions, edge_labels=labels, font_color='red', alpha=0.7)
 
     plt.axis("off")
     plt.show()
