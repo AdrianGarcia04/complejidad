@@ -1,9 +1,12 @@
-NODES=15
+NODES=17
+EDGE_PROB=30
 DATA_DIR=data
 MAX_WEIGHT=200
 
-run:
+run: gen test
+
+test:
 	python3 p1.py data/instance.txt $(MAX_WEIGHT)
 
 gen:
-	python3 GenerateProblem.py $(NODES) > $(DATA_DIR)/instance.txt
+	python3 GenerateProblem.py $(NODES) $(EDGE_PROB) > $(DATA_DIR)/instance.txt
