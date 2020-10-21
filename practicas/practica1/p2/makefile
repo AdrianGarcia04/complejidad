@@ -1,8 +1,10 @@
-NUM_VARS=10
-NUM_CLAUSES=5
+NUM_VARS=15
+NUM_CLAUSES=10
 DATA_DIR=data
 
-run:
+run: gen test
+
+test:
 	python3 p2.py data/instance.txt
 
 gen:

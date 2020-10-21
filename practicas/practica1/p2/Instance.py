@@ -21,3 +21,13 @@ class Instance:
             v3 = int(segments[2].strip())
 
             self.formulas.append((v1, v2, v3))
+
+    def __str__(self):
+        res = ""
+        for formula in self.formulas:
+            (v1, v2, v3) = formula
+            v1 = abs(v1)
+            v2 = abs(v2)
+            v3 = abs(v3)
+            res += "(x_{} v x_{} v x_{}) ^ ".format(v1, v2, v3)
+        return res[:-2]

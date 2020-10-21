@@ -6,7 +6,7 @@ class Solution:
         self.asigns = np.zeros(num_vars, dtype='int')
 
         for i in range(num_vars):
-            self.asigns[i] = (np.random.rand() * 1000) % 2
+            self.asigns[i] = np.random.randint(2)
 
     def eval(self, instance):
         passed = 0
@@ -28,3 +28,11 @@ class Solution:
     def to_var(self, variables):
         (v1, v2, v3) = variables
         return (np.absolute(v1) - 1, np.absolute(v2) - 1, np.absolute(v3) - 1)
+
+    def __str__(self):
+        res = ""
+        i = 0
+        for asign in self.asigns:
+            res += "x_{} = {}\n".format(i, "T" if asign == 1 else "F")
+            i += 1
+        return res[:-1]
