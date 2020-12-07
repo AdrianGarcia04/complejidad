@@ -22,23 +22,22 @@ def remove(l, t):
 
 if __name__ == '__main__':
     problem_set = [int(c) for c in sys.argv[1].strip('[]').split(',')]
+    print("Conjunto de entrada: ", problem_set)
     problem_set.insert(0, 0)
+
     t = int(sys.argv[2])
+    print("Valor de t: ", t)
+
     eps = float(sys.argv[3])
+    print("Valor de epsilon: ", eps)
 
     n = len(problem_set)
     lists = [[]] * n
     lists[0] = [0]
-    print(f"line 2: L{0} = ", lists[0], "\n")
 
     for i in range(1, n):
         lists[i] = merge_lists(lists[i - 1], suml(lists[i - 1], problem_set[i]))
-        print(f"line 4: L{i} = ", lists[i])
-
         lists[i] = trim(lists[i], eps / (2 * n))
-        print(f"line 5: L{i} = ", lists[i])
-
         lists[i] = remove(lists[i], t)
-        print(f"line 6: L{i} = ", lists[i], "\n")
 
-    print(max(lists[n - 1]))
+    print("Se encontró un subconjunto cuya suma es: ", max(lists[n - 1]))
