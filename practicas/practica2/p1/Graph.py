@@ -1,120 +1,156 @@
-import math
-import numpy as np
-from itertools import tee
+import random
 from collections import deque
 
-def pairwise(iterable):
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
+class Node():
+	def __init__(self, id):
+		self.id = id
+		self.vecinos = []
+	def addNeigh(self, n):
+		self.vecinos.append(n)
+	def remNeigh(self, n):
+		self.vecinos.remove(n)
+	def __str__(self):
+		return str(self.id)
 
-class Node:
-    def __init__(self, id, x, y):
-        self.id = id
-        self.x = x
-        self.y = y
-        self.neighbors = []
+class Edge():
+	def __init__(self, v1, v2, d):
+		self.v1 = v1
+		self.v2 = v2
+		self.d = d
+	def graph(self):
+		return (f"{self.v1}", f"{self.v2}")
+	def __str__(self):
+		return f"{str(self.v1)}, {str(self.v2)}: {str(self.s)}"
 
-    def add_neighbor(self, n):
-        self.neighbors.append(n)
+class Graph():
 
-    def remove_neighbor(self, n):
-        self.neighbors.remove(n)
+	def __init__(self, nodes = [], edges = []):
+		self.nodes = nodes
+		self.edges = edges
+		for edge in self.edges:
+			edge.v1.addNeigh(edge.v2)
+			edge.v2.addNeigh(edge.v1)
+		self.tree = self
+		self.tour = []
 
-    def clean(self):
-        self.neighbors = []
+	def addEdge(self, edge):
+		for vertex in self.nodes:
+			if vertex.id == edge.v1.id:
+				vertex.addNeigh(edge.v2)
+			elif vertex.id == edge.v2.id:
+				vertex.addNeigh(edge.v1)
+		self.edges.append(edge)
 
-    def __str__(self):
-        return str(f'{self.id}: {self.x},{self.y}')
+	def remEdge(self, edge):
+		for vertex in self.nodes:
+			if vertex.id == edge.v1.id:
+				vertex.remNeigh(edge.v2)
+			elif vertex.id == edge.v2.id:
+				vertex.remNeigh(edge.v1)
+		self.edges.remove(edge)
 
-class Edge:
-    def __init__(self, v1, v2, d):
-        self.v1 = v1
-        self.v2 = v2
-        self.d = d
+	def cycle2(self, s, visited):
+		parent = [-1 for i in self.nodes]
+		q = deque()
+		visited[s] = True
+		q.append(s)
 
-    def __str__(self):
-        return str(f'({self.v1}) {self.d} ({self.v2})')
+		while q:
+			u = q.pop()
+			for v in self.nodes[u].vecinos:
+				i = self.nodes.index(v)
+				if not visited[i]:
+					visited[i] = True
+					q.append(i)
+					parent[i] = u
+				elif parent[u] != i:
+					return True
+		return False
 
-class Graph:
-    def __init__(self, file, create_edges=True):
-        self.nodes = []
-        self.edges = []
-        self.file = file
-        self.read_file(file)
-        if create_edges:
-            self.create_edges()
+	def has_cycle(self):
+		visited = [False for i in self.nodes]
+		for i in self.nodes:
+			if not visited[self.nodes.index(i)] and self.cycle2(self.nodes.index(i), visited):
+				return True
+		return False
 
-    def read_file(self, path):
-        file = open(path, "r")
-        lines = list(filter(lambda a: len(a) > 0, file.read().split('\n')))
+	def getTour(self, original_edges, original_nodes):
+		pila = deque()
+		s = random.choice(self.nodes)
+		pila.append(s)
+		visit = []
 
-        vertex_set = list(filter(lambda a: a[0].isdigit(), lines))
-        cities = list(map(lambda x: tuple(x.split(' ')[1:]), vertex_set))
-        self.nodes = [Node(i, int(c[0]), int(c[1])) for i, c in enumerate(cities)]
+		while pila:
+			top = pila.pop()
+			visit.append(top)
+			adj = top.vecinos
+			for vertex in adj:
+				if not vertex in visit:
+					pila.append(vertex)
 
-    def add_edge(self, edge):
-        self.edges.append(edge)
+		visit.append(s)
+		tour = []
+		count = []
+		for i, vertex in enumerate(visit):
+			if i != len(visit) - 1:
+				for edge in original_edges:
+					if edge.v1.id == vertex.id and edge.v2.id == visit[i+1].id:
+						tour.append(edge)
+						if not edge.v1 in count:
+							count.append(edge.v1)
+						if not edge.v2 in count:
+							count.append(edge.v2)
 
-    def remove_edge(self, edge):
-        self.edges.remove(edge)
+					elif edge.v2.id == vertex.id and edge.v1.id == visit[i+1].id:
+						tour.append(edge)
+						if not edge.v1 in count:
+							count.append(edge.v1)
+						if not edge.v2 in count:
+							count.append(edge.v2)
 
-    def create_edges(self):
-        self.edges = []
-        for i, u in enumerate(self.nodes):
-            for j, v in enumerate(self.nodes[i + 1:]):
-                d = math.sqrt((int(v.x - u.x) ** 2) + (int(v.y - u.y) ** 2))
-                self.edges.append(Edge(u.id, v.id, d))
+		tourS = []
+		tourS.append(tour[0])
+		for edge in tour:
+			if edge != tourS[len(tourS) - 1]:
+				tourS.append(edge)
+		tour = tourS[:]
+		self.tour = tourS
 
-                u.neighbors.append(v)
-                v.neighbors.append(u)
+	def conex(self):
+		visit = []
+		for edge in self.edges:
+			visit.append(edge.v1)
+			visit.append(edge.v2)
+		return len(list(set(visit))) == len(self.nodes)
 
-    def conex(self):
-        visited = []
-        for edge in self.edges:
-            visited.append(edge.v1)
-            visited.append(edge.v2)
-        return len(self.nodes) == len(list(set(visited)))
+	def getTree(self):
+		arInOrder = []
+		nodes = []
+		count = []
+		for vertex in self.nodes:
+			nodes.append(Node(vertex.id))
 
-    def cycle(self):
-        visited = [False for i in self.nodes]
-        for i in self.nodes:
-            if not visited[self.nodes.index(i)] and self.cycleaux(self.nodes.index(i), visited):
-                return True
-        return False
+		for i, edge in enumerate(self.edges):
+			for v1 in nodes:
+				if edge.v1.id == v1.id:
+					for v2 in nodes:
+						if edge.v2.id == v2.id:
+							if not (v1,v2) in count:
+								arInOrder.append(Edge(v1, v2, edge.d))
+								count.append((v1,v2))
 
-    def cycleaux(self, s, visited):
-        parent = [-1 for i in self.nodes]
-        q = deque()
-        visited[s] = True
-        q.append(s)
-        while q:
-            u = q.pop()
-            for v in self.nodes[u].neighbors:
-                if not visited[self.nodes.index(v)]:
-                    visited[self.nodes.index(v)] = True
-                    q.append(self.nodes.index(v))
-                    parent[self.nodes.index(v)] = u
-                elif parent[u] != self.nodes.index(v):
-                    return True
-        return False
+				elif edge.v2.id == v1.id:
+					for v2 in nodes:
+						if edge.v1.id == v2.id:
+							if not (v2,v1) in count:
+								arInOrder.append(Edge(v2, v1, edge.d))
+								count.append((v2,v1))
 
-    def findMST(self):
-        sorted_edges = sorted(self.edges, key = lambda edge: edge.d)
-
-        tree = Graph(self.file, create_edges=False)
-
-        # while not tree.conex():
-        #     for edge in sorted_edges:
-        #         tree.add_edge(edge)
-        #         if tree.cycle():
-        #             tree.remove_edge(edge)
-
-        while not tree.conex():
-            tree.add_edge(sorted_edges.pop(0))
-            if tree.cycle():
-                tree.remove_edge(edge)
-
-        for e in tree.edges:
-            print(e)
-        self.spaning_tree = tree
+		arInOrder = sorted(arInOrder, key = lambda edge: edge.d)
+		tree = Graph(nodes = nodes)
+		while not tree.conex():
+			for edge in arInOrder:
+				tree.addEdge(edge)
+				if tree.has_cycle():
+					tree.remEdge(edge)
+		self.tree = tree
