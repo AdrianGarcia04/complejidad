@@ -1,10 +1,6 @@
 import arguments
 import numpy as np
-
-class Individuo:
-    def __init__(self, tablero, fitness=0):
-        self.tablero = list(tablero)
-        self.fitness = fitness
+from Individuo import Individuo
 
 def generaPoblacionInicial():
     rango = list(range(1, nReinas + 1))
@@ -13,7 +9,7 @@ def generaPoblacionInicial():
 def evaluaPoblacion(poblacion):
     fitness = []
     for ind in poblacion:
-        fitness.append(calcFitness(ind))
+        fitness.append(ind.calcFitness())
     return fitness
 
 def formaNuevaPoblacion(poblacion, fitness):
@@ -65,36 +61,6 @@ def cruza(ind1, ind2):
         i += 1
     return Individuo(nuevo)
 
-def crear_tablero(n):
-    return np.zeros((n, n), dtype=int)
-
-def llenar_tablero(tablero, gen):
-    for (i, pos) in enumerate(gen):
-        tablero[pos][i] = 1
-    return tablero
-
-def calcFitness(ind):
-    indTablero = [x - 1 for x in ind.tablero]
-    hits = 0
-    tablero = llenar_tablero(crear_tablero(nReinas), list(indTablero))
-    col = 0
-    for queen in list(indTablero):
-        try:
-            for i in range(col - 1, -1, -1):
-                if tablero[queen][i] == 1:
-                    hits += 1
-        except IndexError:
-            pass
-        for i, j in zip(range(queen - 1, -1, -1), range(col - 1, -1, -1)):
-            if tablero[i][j] == 1:
-                hits += 1
-        for i, j in zip(range(queen + 1, nReinas, 1), range(col - 1, -1, -1)):
-            if tablero[i][j] == 1:
-                hits += 1
-        col += 1
-    ind.fitness = np.sum(list(range(nReinas))) - hits
-    return ind.fitness
-
 def main(args):
     args = vars(args)
     global nReinas
@@ -110,21 +76,4 @@ def main(args):
     porcMutacion = args['porcMutacion']
     funSeleccion = args['funSeleccion']
 
-    poblacion = generaPoblacionInicial()
-    fitness = evaluaPoblacion(poblacion)
-
-    fitnessMedio = np.zeros((maxGen,), dtype=int)
-    mejorFitness = np.zeros((maxGen,), dtype=int)
-    mejorIndividuo = np.zeros((maxGen, nReinas), dtype=int)
-
-    gen = 0
-    while gen < maxGen:
-        poblacion = formaNuevaPoblacion(poblacion, fitness)
-        fitness = evaluaPoblacion(poblacion)
-        gen += 1
-
-    ordenados = sorted(poblacion, key=lambda x: x.fitness)
-    print(ordenados[49].tablero, ordenados[49].fitness)
-
 main(arguments.defineArgs())
-# calcFitness([5,3,1,6,8,2,4,7])
