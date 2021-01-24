@@ -28,6 +28,33 @@ class Individuo:
         self.fitness = np.sum(list(range(len(self.tablero)))) - hits
         return self.fitness
 
+    def __str__(self):
+        #    _ _ _ _ _ _ _ _
+        #   |Q|_|_|_|_|_|_|_|
+        #   |_|Q|_|_|_|_|_|_|
+        #   |_|_|Q|_|_|_|_|_|
+        #   |_|_|_|Q|_|_|_|_|
+        #   |_|_|_|_|Q|_|_|_|
+        #   |_|_|_|_|_|Q|_|_|
+        #   |_|_|_|_|_|_|Q|_|
+        #   |_|_|_|_|_|_|_|Q|
+        n = len(self.tablero)
+        matr = crear_tablero(n)
+        for i in range(n):
+            for j in range(n):
+                if (i + 1) == self.tablero[j]:
+                    matr[i][j] = 1
+
+        tablero = " _ _ _ _ _ _ _  \n"
+        for i in range(n):
+            for j in range(n):
+                tablero += '|'
+                tablero += '♛' if matr[i][j] == 1 else '_'
+            tablero = tablero[:-1] + '\n'
+
+        return tablero
+
+
 def crear_tablero(n):
     return np.zeros((n, n), dtype=int)
 

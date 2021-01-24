@@ -76,4 +76,18 @@ def main(args):
     porcMutacion = args['porcMutacion']
     funSeleccion = args['funSeleccion']
 
+    poblacion = generaPoblacionInicial()
+    fitness = evaluaPoblacion(poblacion)
+
+    gen = 0
+    while gen < maxGen:
+        print(f'Gen {gen}:{maxGen}', end='\r')
+        poblacion = formaNuevaPoblacion(poblacion, fitness)
+        fitness = evaluaPoblacion(poblacion)
+        gen += 1
+
+    ordenados = sorted(poblacion, key=lambda x: x.fitness)
+    max_choques = np.sum(list(range(nReinas)))
+    print(str(ordenados[49]), f'{max_choques - ordenados[49].fitness} colision(es)')
+
 main(arguments.defineArgs())

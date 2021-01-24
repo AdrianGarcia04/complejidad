@@ -31,6 +31,7 @@ def main(args):
     mejorConfiguracion = configuracion
 
     while temperatura > 0:
+        print(f'Temp: {temperatura}', end='\r')
         vecino = generarVecino(configuracion)
         fitnessActual = configuracion.fitness
         fitnessVecino = vecino.fitness
@@ -48,6 +49,7 @@ def main(args):
 
         temperatura -= 1
 
-    print(mejorConfiguracion.tablero)
-    print(mejorConfiguracion.fitness)
+    max_choques = np.sum(list(range(nReinas)))
+    print(str(mejorConfiguracion), f'{max_choques - mejorConfiguracion.fitness} colision(es)')
+    
 main(arguments.defineArgs())
