@@ -30,6 +30,10 @@ def main(args):
     configuracion = generaTableroInicial()
     mejorConfiguracion = configuracion
 
+    max_choques = np.sum(list(range(nReinas)))
+    print("Ejemplar inicial")
+    print(str(configuracion), f'{max_choques - configuracion.fitness} colision(es)')
+
     while temperatura > 0:
         print(f'Temp: {temperatura}', end='\r')
         vecino = generarVecino(configuracion)
@@ -49,7 +53,7 @@ def main(args):
 
         temperatura -= 1
 
-    max_choques = np.sum(list(range(nReinas)))
+    print("\nMejor encontrado")
     print(str(mejorConfiguracion), f'{max_choques - mejorConfiguracion.fitness} colision(es)')
-    
+
 main(arguments.defineArgs())

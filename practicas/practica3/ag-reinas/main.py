@@ -79,6 +79,10 @@ def main(args):
     poblacion = generaPoblacionInicial()
     fitness = evaluaPoblacion(poblacion)
 
+    max_choques = np.sum(list(range(nReinas)))
+    print("Ejemplar inicial")
+    print(str(poblacion[49]), f'{max_choques - poblacion[49].fitness} colision(es)')
+
     gen = 0
     while gen < maxGen:
         print(f'Gen {gen}:{maxGen}', end='\r')
@@ -87,7 +91,7 @@ def main(args):
         gen += 1
 
     ordenados = sorted(poblacion, key=lambda x: x.fitness)
-    max_choques = np.sum(list(range(nReinas)))
+    print("\nMejor encontrado")
     print(str(ordenados[49]), f'{max_choques - ordenados[49].fitness} colision(es)')
 
 main(arguments.defineArgs())
